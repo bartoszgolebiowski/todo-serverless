@@ -10,7 +10,7 @@ const createTodo = async (event) => {
     const inputErrors = validateInput(input);
 
     if (Array.isArray(inputErrors) && inputErrors.length) {
-        throw Error(response(UNPROCESSABLE_ENTITY, emptyFieldsError(inputErrors)));
+        return response(UNPROCESSABLE_ENTITY, emptyFieldsError(inputErrors));
     }
     const entity = createTodoJSON(input);
     const todoDBObject = createDBObjectToPut(process.env.TODO_TABLE, entity);

@@ -4,7 +4,8 @@
   "description": "todo-serverless",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -u bdd -R spec -t 500 --recursive",
+    "watch": "mocha -u bdd -R spec -t 500 --recursive --watch"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,8 @@
     "uuid": "latest"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0",
     "serverless": "^1.49.0",
     "serverless-aws-alias": "^1.7.2",
     "serverless-aws-documentation": "^1.1.0",
@@ -29,6 +32,7 @@
     "serverless-dynamodb-local": "^0.2.38",
     "serverless-iam-roles-per-function": "^2.0.1",
     "serverless-offline": "^5.10.1",
-    "serverless-reqvalidator-plugin": "^1.0.3"
+    "serverless-reqvalidator-plugin": "^1.0.3",
+    "sinon": "^7.4.1"
   }
 }

@@ -1,5 +1,3 @@
-const {UNPROCESSABLE_ENTITY} = require('./constants');
-
 const response = (statusCode, message) => {
     return {
         statusCode: statusCode,
