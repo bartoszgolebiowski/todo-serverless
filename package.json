@@ -1,0 +1,25 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "todo-serverless",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bartoszgolebiowski/todo-serverless.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bartoszgolebiowski/todo-serverless/issues"
+  },
+  "homepage": "https://github.com/bartoszgolebiowski/todo-serverless#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "serverless": "^1.49.0",
+    "serverless-offline": "^5.10.1"
+  }
+}
