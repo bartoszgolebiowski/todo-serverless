@@ -1,18 +1,25 @@
 'use strict';
 
-const putItem = async (ddb, params) => {
-    return new Promise((res, rej) => {
-        ddb.put(params, (err, data) => {
-            if (err) {
-                console.log("Error while saving item into DB", params);
-                rej(err);
-            } else {
-                console.log("Save success", params);
-                res(params.Item);
-            }
-        })
-    });
+const createDBObjectToScan = (tableName) => {
+    return {
+        TableName: tableName,
+    };
 };
+
+const createDBObjectToGet = (tableName, json) => {
+    return {
+        TableName: tableName,
+        Key: json
+    };
+};
+
+const createDBObjectToDelete = (tableName, json) => {
+    return {
+        TableName: tableName,
+        Key: json,
+    };
+};
+
 const createDBObjectToPut = (tableName, json) => {
     return {
         TableName: tableName,
@@ -21,6 +28,8 @@ const createDBObjectToPut = (tableName, json) => {
 };
 
 module.exports = {
-    createDBObjectToPut:createDBObjectToPut,
-    putItem: putItem
+    createDBObjectToPut: createDBObjectToPut,
+    createDBObjectToGet: createDBObjectToGet,
+    createDBObjectToScan: createDBObjectToScan,
+    createDBObjectToDelete: createDBObjectToDelete,
 };

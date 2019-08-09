@@ -16,7 +16,7 @@ const emptyFieldsError = (inputErrors) => {
         emptyFields.push(inputErrors[i]);
     }
 
-    return {"error": "Empty fields: " + emptyFields.join(", ")};
+    return {"message":"Incorrect input", "error": "Empty fields: " + emptyFields.join(", ")};
 };
 
 module.exports = {

@@ -19,8 +19,11 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action:
-        - dynamodb:PutItem
-      Resource: "*"
+        "*"
+      Resource:
+        Fn::GetAtt:
+          - todoTable
+          - Arn
 
   environment:
     TODO_TABLE: 'todoTable'
@@ -29,17 +32,57 @@ custom:
   dynamodb:
     stages:
       - test
-  models:
-    - name: createOrderRequest
-      contentType: "application/json"
-      schema:
-        required:
-          - name
-        properties:
-           name:
-            type: string
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: Todo API
+        description: Serverless, nodejs todo app
+    models:
+      - name: createTodo
+        contentType: "application/json"
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+          required:
+            - name
+
+      - name: updateAndDeleteTodo
+        contentType: "application/json"
+        schema:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+          required:
+            - todo_id
+            - name
+      - name: getSingleTodo
+        contentType: "application/json"
+        schema:
+          type: object
+          properties:
+            id:
+              type: string
+          required:
+            - todo_id
+
 
 functions:
+  getAllTodo:
+    handler: src/todo/todoController.getAllTodo
+    name: getAllTodo
+    events:
+    - http:
+        documentation:
+          summary: "Gets all todo"
+          description: "Gets all todo"
+        path: todo
+        method: get
   createTodo:
     handler: src/todo/todoController.createTodo
     name: createTodo
@@ -49,11 +92,49 @@ functions:
             summary: "Create new todo"
             description: "Creates new todo"
             requestModels:
-              "application/json": createOrderRequest
-          path: todo
+              "application/json": createTodo
+          path: todo/create
           method: post
           reqValidatorName: onlyBody
-
+  updateTodo:
+    handler: src/todo/todoController.updateTodo
+    name: updateTodo
+    events:
+      - http:
+          documentation:
+            summary: "Updates existing todo"
+            description: "Updates existing todo"
+            requestModels:
+              "application/json": updateAndDeleteTodo
+          path: todo/update
+          method: patch
+          reqValidatorName: onlyBody
+  deleteTodo:
+    handler: src/todo/todoController.deleteTodo
+    name: deleteTodo
+    events:
+      - http:
+          documentation:
+            summary: "Deletes todo"
+            description: "Deletes todo"
+            requestModels:
+              "application/json": updateAndDeleteTodo
+          path: todo/delete
+          method: delete
+          reqValidatorName: onlyBody
+  getSingleTodo:
+    handler: src/todo/todoController.getSingleTodo
+    name: getSingleTodo
+    events:
+      - http:
+          documentation:
+            summary: "Gets single todo"
+            description: "Gets single todo"
+            requestModels:
+              "application/json": getSingleTodo
+          path: todo/{todo_id}
+          method: get
+          reqValidatorName: onlyBody
 resources:
   Resources:
     todoTable:
@@ -63,18 +144,12 @@ resources:
         AttributeDefinitions:
           - AttributeName: todo_id
             AttributeType: S
-          - AttributeName: name
-            AttributeType: S
         KeySchema:
           - AttributeName: todo_id
             KeyType: HASH
-          - AttributeName: name
-            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-
-
 
     onlyBody:
       Type: "AWS::ApiGateway::RequestValidator"
@@ -83,3 +158,4 @@ resources:
         RestApiId:
           Ref: ApiGatewayRestApi
         ValidateRequestBody: true
+        ValidateRequestParameters: true
