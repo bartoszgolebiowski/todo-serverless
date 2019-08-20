@@ -3,7 +3,7 @@ const {dbClient} = require('../config/dbConfig');
 const {HTTP_OK_NO_CONTENT, HTTP_OK_WITH_CONTENT, UNPROCESSABLE_ENTITY, INTERNAL_ERROR, RESOURCE_DOES_NOT_FIND} = require('../utils/constants');
 const {response, validateInput, emptyFieldsError} = require('../utils/genericService');
 const {createDBObjectToPut, createDBObjectToGet, createDBObjectToDelete, createDBObjectToScan} = require('../utils/dbService');
-const {createTodoJSON, createDBObjectToUpdateName} = require('./todoService');
+const {createTodoJSON, createDBObjectToUpdateAuthor} = require('./todoService');
 
 const getSingleTodo = async (event) => {
     const {todo_id} = event.pathParameters;
@@ -37,7 +37,7 @@ const createTodo = async (event) => {
     const entity = createTodoJSON(input);
     const todoDBObject = createDBObjectToPut(process.env.TODO_TABLE, entity);
     return await dbClient.put(todoDBObject).promise()
-        .then(() => response(HTTP_OK_NO_CONTENT, {"message": "Todo saved!"}))
+        .then(() => response(HTTP_OK_WITH_CONTENT, {"message": "Todo saved!", "todo": entity}))
         .catch((o1) => response(INTERNAL_ERROR, {"message": "Todo could not be saved!", "error": o1}))
 };
 
@@ -67,7 +67,7 @@ const updateTodo = async (event) => {
     if (Array.isArray(inputErrors) && inputErrors.length) {
         return response(UNPROCESSABLE_ENTITY, emptyFieldsError(inputErrors));
     }
-    const todoDBObject = createDBObjectToUpdateName(process.env.TODO_TABLE, input);
+    const todoDBObject = createDBObjectToUpdateAuthor(process.env.TODO_TABLE, input);
     const paramGetSingle = createDBObjectToGet(process.env.TODO_TABLE, {"todo_id": input.todo_id});
 
     return await Promise.all([dbClient.get(paramGetSingle).promise(), dbClient.update(todoDBObject).promise()])

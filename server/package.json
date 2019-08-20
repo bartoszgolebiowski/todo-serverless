@@ -20,6 +20,8 @@
   "homepage": "https://github.com/bartoszgolebiowski/todo-serverless#readme",
   "dependencies": {
     "aws-sdk": "^2.506.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.5.1",
     "uuid": "latest"
   },
   "devDependencies": {

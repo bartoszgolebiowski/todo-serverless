@@ -7,7 +7,7 @@ const creteTodoJSON = (input) => {
 };
 
 
-const createDBObjectToUpdateName = (tableName, input) => {
+const createDBObjectToUpdateAuthor = (tableName, input) => {
     const {todo_id, author} = input;
     return {
         TableName: tableName,
@@ -24,7 +24,7 @@ const createDBObjectToUpdateName = (tableName, input) => {
 
 module.exports = {
     createTodoJSON: creteTodoJSON,
-    createDBObjectToUpdateName: createDBObjectToUpdateName,
+    createDBObjectToUpdateAuthor: createDBObjectToUpdateAuthor,
 };
 
 

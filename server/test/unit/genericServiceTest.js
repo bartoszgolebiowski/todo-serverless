@@ -45,7 +45,7 @@ describe('genericService tests', () => {
             const input = ['name'];
             const result = emptyFieldsError(input);
 
-            expect(result).to.deep.equal({"error": "Empty fields: name"});
+            expect(result).to.deep.equal({"message":"Incorrect input", "error": "Empty fields: name"});
         });
     });
 });

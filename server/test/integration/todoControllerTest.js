@@ -1,12 +1,13 @@
 const {expect} = require('chai');
 const {describe} = require("mocha");
 const fetch = require('node-fetch');
-
 const AWS = require('aws-sdk');
+
 const {createTodoJSON} = require('../../src/todo/todoService');
 const {HTTP_OK_NO_CONTENT, HTTP_OK_WITH_CONTENT, UNPROCESSABLE_ENTITY} = require('../../src/utils/constants');
-const {createDBObjectToPut, createDBObjectToGet: createDBObjectToDelete, createDBObjectToScan} = require('../../src/utils/dbService');
+const {createDBObjectToPut, createDBObjectToDelete, createDBObjectToScan} = require('../../src/utils/dbService');
 
+const URL = 'http://localhost:3000';
 const {todoMock} = require('../mock/todoMock');
 const tableName = 'todoTable';
 const dbClient = new AWS.DynamoDB.DocumentClient({
@@ -21,7 +22,7 @@ describe('todoController integration tests', () => {
         it('get all todos', async () => {
             const {Items} = await dbClient.scan(createDBObjectToScan(tableName)).promise();
 
-            const result = await fetch('http://localhost:3000/todo')
+            const result = await fetch(URL + '/todo')
                 .then(res => Promise.all([res.status, res.json()]));
 
             expect(result[1].Items).to.be.deep.equal(Items);
@@ -34,7 +35,7 @@ describe('todoController integration tests', () => {
             for (let singleMock of todoMock) {
                 let todoJson = createTodoJSON(singleMock);
                 let todoDBObject = createDBObjectToPut(tableName, todoJson);
-                await dbClient.put(todoDBObject).promise().then(o1 => o1);
+                await dbClient.put(todoDBObject).promise();
             }
         });
 
@@ -45,7 +46,7 @@ describe('todoController integration tests', () => {
                 let todoDBObject = createDBObjectToDelete(tableName, {
                     "todo_id": todo_id,
                 });
-                await dbClient.delete(todoDBObject).promise().then(o1 => o1);
+                await dbClient.delete(todoDBObject).promise();
             }
         });
     });
@@ -57,7 +58,7 @@ describe('todoController integration tests', () => {
                 "name": "nowy todo z testu integracyjnego"
             };
 
-            const result = await fetch('http://localhost:3000/todo/create', {
+            const result = await fetch(URL + '/todo/create', {
                 method: 'POST',
                 body: JSON.stringify(input)
             })
@@ -65,7 +66,9 @@ describe('todoController integration tests', () => {
 
             const {Items} = await dbClient.scan(createDBObjectToScan(tableName)).promise();
             expect(result[1].message).to.be.deep.equal("Todo saved!");
-            expect(result[0]).to.be.deep.equal(HTTP_OK_NO_CONTENT);
+            expect(result[1].todo.name).to.be.deep.equal("nowy todo z testu integracyjnego");
+            expect(result[1].todo).to.have.all.keys('todo_id', 'name');
+            expect(result[0]).to.be.deep.equal(HTTP_OK_WITH_CONTENT);
             expect(Items).to.be.length(6);
         });
 
@@ -74,7 +77,8 @@ describe('todoController integration tests', () => {
                 "name": ""
             };
 
-            const result = await fetch('http://localhost:3000/todo/create', {
+
+            const result = await fetch(URL + '/todo/create', {
                 method: 'POST',
                 body: JSON.stringify(input)
             })
@@ -91,7 +95,7 @@ describe('todoController integration tests', () => {
             for (let singleMock of todoMock) {
                 let todoJson = createTodoJSON(singleMock);
                 let todoDBObject = createDBObjectToPut(tableName, todoJson);
-                await dbClient.put(todoDBObject).promise().then(o1 => o1);
+                await dbClient.put(todoDBObject).promise();
                 const {Items} = await dbClient.scan(createDBObjectToScan(tableName)).promise();
             }
         });
@@ -103,7 +107,7 @@ describe('todoController integration tests', () => {
                 let todoDBObject = createDBObjectToDelete(tableName, {
                     "todo_id": todo_id,
                 });
-                await dbClient.delete(todoDBObject).promise().then(o1 => o1);
+                await dbClient.delete(todoDBObject).promise();
             }
         });
 
@@ -117,7 +121,7 @@ describe('todoController integration tests', () => {
             const input = Object.assign(itemToUpdate, {"author": "Jakub"});
 
             const result =
-                await fetch('http://localhost:3000/todo/update', {method: 'PATCH', body: JSON.stringify(input)})
+                await fetch(URL + '/todo/update', {method: 'PATCH', body: JSON.stringify(input)})
                     .then(res => Promise.all([res.status, res.json()]));
 
             const {Items: ItemsAfter} = await dbClient.scan(createDBObjectToScan(tableName)).promise();
@@ -136,7 +140,7 @@ describe('todoController integration tests', () => {
             const input = Object.assign(itemToUpdate, {"author": ""});
 
             const result =
-                await fetch('http://localhost:3000/todo/update', {method: 'PATCH', body: JSON.stringify(input)})
+                await fetch(URL + '/todo/update', {method: 'PATCH', body: JSON.stringify(input)})
                     .then(res => Promise.all([res.status, res.json()]));
 
             expect(result[1].error).to.be.deep.equal("Empty fields: author");
@@ -148,11 +152,11 @@ describe('todoController integration tests', () => {
         it('non existing object', async () => {
             const {Items} = await dbClient.scan(createDBObjectToScan(tableName)).promise();
             const itemToUpdate = Items[0];
-            const toUpdate = {"todo_id": "123", "author": "Jakub"};
-            const input = Object.assign(itemToUpdate, toUpdate);
+            const toUpdate = {"todo_id": "123", "author": "Grzes"};
+            const input = Object.assign({},itemToUpdate, toUpdate);
 
             const result =
-                await fetch('http://localhost:3000/todo/update', {method: 'PATCH', body: JSON.stringify(input)})
+                await fetch(URL + '/todo/update', {method: 'PATCH', body: JSON.stringify(input)})
                     .then(res => Promise.all([res.status, res.json()]));
 
             expect(result[1].message).to.be.deep.equal("Todo could not be updated!");
@@ -164,7 +168,7 @@ describe('todoController integration tests', () => {
             for (let singleMock of todoMock) {
                 let todoJson = createTodoJSON(singleMock);
                 let todoDBObject = createDBObjectToPut(tableName, todoJson);
-                await dbClient.put(todoDBObject).promise().then(o1 => o1);
+                await dbClient.put(todoDBObject).promise();
             }
         });
 
@@ -175,7 +179,7 @@ describe('todoController integration tests', () => {
                 let todoDBObject = createDBObjectToDelete(tableName, {
                     "todo_id": todo_id,
                 });
-                await dbClient.delete(todoDBObject).promise().then(o1 => o1);
+                await dbClient.delete(todoDBObject).promise();
             }
         });
 
@@ -187,7 +191,7 @@ describe('todoController integration tests', () => {
             const {Items: ItemsBefore} = await dbClient.scan(createDBObjectToScan(tableName)).promise();
             const itemToDelete = ItemsBefore[0];
 
-            const result = await fetch('http://localhost:3000/todo/delete', {
+            const result = await fetch(URL + '/todo/delete', {
                 method: 'DELETE',
                 body: JSON.stringify({"todo_id": itemToDelete['todo_id']})
             }).then(res => Promise.all([res.status, res.json()]));
@@ -201,7 +205,7 @@ describe('todoController integration tests', () => {
 
         it('wrong input', async () => {
             const result =
-                await fetch('http://localhost:3000/todo/update', {
+                await fetch(URL + '/todo/update', {
                     method: 'PATCH',
                     body: JSON.stringify({"todo_id": ""})
                 })
@@ -214,7 +218,7 @@ describe('todoController integration tests', () => {
         });
 
         it('non existing object', async () => {
-            const result = await fetch('http://localhost:3000/todo/delete', {
+            const result = await fetch(URL + '/todo/delete', {
                 method: 'DELETE',
                 body: JSON.stringify({"todo_id": "test"})
             }).then(res => Promise.all([res.status, res.json()]));
@@ -230,7 +234,7 @@ describe('todoController integration tests', () => {
             for (let singleMock of todoMock) {
                 let todoJson = createTodoJSON(singleMock);
                 let todoDBObject = createDBObjectToPut(tableName, todoJson);
-                await dbClient.put(todoDBObject).promise().then(o1 => o1);
+                await dbClient.put(todoDBObject).promise();
             }
         });
 
@@ -241,7 +245,7 @@ describe('todoController integration tests', () => {
                 let todoDBObject = createDBObjectToDelete(tableName, {
                     "todo_id": todo_id,
                 });
-                await dbClient.delete(todoDBObject).promise().then(o1 => o1);
+                await dbClient.delete(todoDBObject).promise();
             }
         });
 
@@ -252,7 +256,7 @@ describe('todoController integration tests', () => {
         it('correct input', async () => {
             const {Items} = await dbClient.scan(createDBObjectToScan(tableName)).promise();
             const singleItem = Items[0];
-            const result = await fetch(`http://localhost:3000/todo/${singleItem['todo_id']}`, {
+            const result = await fetch(`${URL}/todo/${singleItem['todo_id']}`, {
                 method: 'GET'
             }).then(res => Promise.all([res.status, res.json()]));
 
@@ -264,7 +268,7 @@ describe('todoController integration tests', () => {
             const todo_id = "123";
             const {Items} = await dbClient.scan(createDBObjectToScan(tableName)).promise();
             const singleItem = Items[0];
-            const result = await fetch(`http://localhost:3000/todo/${todo_id}`, {
+            const result = await fetch(`${URL}/todo/${todo_id}`, {
                 method: 'GET'
             }).then(res => Promise.all([res.status, res.json()]));
 
@@ -277,7 +281,7 @@ describe('todoController integration tests', () => {
             const {Items: ItemsBefore} = await dbClient.scan(createDBObjectToScan(tableName)).promise();
             const itemToDelete = ItemsBefore[0];
 
-            const result = await fetch('http://localhost:3000/todo/delete', {
+            const result = await fetch(URL + '/todo/delete', {
                 method: 'DELETE',
                 body: JSON.stringify({"todo_id": "test"})
             }).then(res => Promise.all([res.status, res.json()]));
@@ -293,7 +297,7 @@ describe('todoController integration tests', () => {
             for (let singleMock of todoMock) {
                 let todoJson = createTodoJSON(singleMock);
                 let todoDBObject = createDBObjectToPut(tableName, todoJson);
-                await dbClient.put(todoDBObject).promise().then(o1 => o1);
+                await dbClient.put(todoDBObject).promise();
             }
         });
 
@@ -304,7 +308,7 @@ describe('todoController integration tests', () => {
                 let todoDBObject = createDBObjectToDelete(tableName, {
                     "todo_id": todo_id,
                 });
-                await dbClient.delete(todoDBObject).promise().then(o1 => o1);
+                await dbClient.delete(todoDBObject).promise();
             }
         });
 
