@@ -32,6 +32,30 @@ describe('Check table operations', () => {
             await db.createTable(params).promise()
                 .then(() => console.log("todoTable was created!"))
                 .catch(() => console.log("todoTable is already created!"));
-        })
+        });
+        it('create userTable', async () => {
+            const params = {
+                "TableName": "userTable",
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "username",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "username",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": 1,
+                    "WriteCapacityUnits": 1
+                }
+            };
+            await db.createTable(params).promise()
+                .then(() => console.log("userTable was created!"))
+                .catch(() => console.log("userTable is already created!"));
+        });
     });
 });

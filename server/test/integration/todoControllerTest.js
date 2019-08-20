@@ -3,7 +3,7 @@ const {describe} = require("mocha");
 const fetch = require('node-fetch');
 const AWS = require('aws-sdk');
 
-const {createTodoJSON} = require('../../src/todo/todoService');
+const {createTodoJSON} = require('../../src/controller/todo/todoService');
 const {HTTP_OK_NO_CONTENT, HTTP_OK_WITH_CONTENT, UNPROCESSABLE_ENTITY} = require('../../src/utils/constants');
 const {createDBObjectToPut, createDBObjectToDelete, createDBObjectToScan} = require('../../src/utils/dbService');
 
@@ -76,7 +76,6 @@ describe('todoController integration tests', () => {
             const input = {
                 "name": ""
             };
-
 
             const result = await fetch(URL + '/todo/create', {
                 method: 'POST',

@@ -24,9 +24,17 @@ provider:
         Fn::GetAtt:
           - todoTable
           - Arn
+    - Effect: "Allow"
+      Action:
+        "*"
+      Resource:
+        Fn::GetAtt:
+          - userTable
+          - Arn
 
   environment:
     TODO_TABLE: 'todoTable'
+    USER_TABLE: 'userTable'
 
 custom:
   dynamodb:
@@ -48,7 +56,6 @@ custom:
               type: string
           required:
             - name
-
       - name: updateAndDeleteTodo
         contentType: "application/json"
         schema:
@@ -70,11 +77,22 @@ custom:
               type: string
           required:
             - todo_id
-
+      - name: createUser
+        contentType: "application/json"
+        schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+            required:
+              - username
+              - password
 
 functions:
   getAllTodo:
-    handler: src/todo/todoController.getAllTodo
+    handler: src/controller/todo/todoController.getAllTodo
     name: getAllTodo
     events:
     - http:
@@ -84,7 +102,7 @@ functions:
         path: todo
         method: get
   createTodo:
-    handler: src/todo/todoController.createTodo
+    handler: src/controller/todo/todoController.createTodo
     name: createTodo
     events:
       - http:
@@ -97,7 +115,7 @@ functions:
           method: post
           reqValidatorName: onlyBody
   updateTodo:
-    handler: src/todo/todoController.updateTodo
+    handler: src/controller/todo/todoController.updateTodo
     name: updateTodo
     events:
       - http:
@@ -110,7 +128,7 @@ functions:
           method: patch
           reqValidatorName: onlyBody
   deleteTodo:
-    handler: src/todo/todoController.deleteTodo
+    handler: src/controller/todo/todoController.deleteTodo
     name: deleteTodo
     events:
       - http:
@@ -123,7 +141,7 @@ functions:
           method: delete
           reqValidatorName: onlyBody
   getSingleTodo:
-    handler: src/todo/todoController.getSingleTodo
+    handler: src/controller/todo/todoController.getSingleTodo
     name: getSingleTodo
     events:
       - http:
@@ -135,8 +153,36 @@ functions:
           path: todo/{todo_id}
           method: get
           reqValidatorName: onlyBody
+  createUser:
+    handler: src/controller/user/userController.createUser
+    name: createUser
+    events:
+      - http:
+          documentation:
+            summary: "Creates user"
+            description: "Creates user"
+            requestModels:
+              "application/json": createUser
+          path: user/create
+          method: post
+          reqValidatorName: onlyBody
+
 resources:
   Resources:
+    userTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USER_TABLE}
+        AttributeDefinitions:
+          - AttributeName: username
+            AttributeType: S
+        KeySchema:
+          - AttributeName: username
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
     todoTable:
       Type: AWS::DynamoDB::Table
       Properties:

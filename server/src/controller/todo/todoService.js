@@ -6,7 +6,6 @@ const creteTodoJSON = (input) => {
     return Object.assign({}, input, idJSON);
 };
 
-
 const createDBObjectToUpdateAuthor = (tableName, input) => {
     const {todo_id, author} = input;
     return {

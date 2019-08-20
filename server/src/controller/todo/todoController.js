@@ -1,8 +1,8 @@
 'use strict';
-const {dbClient} = require('../config/dbConfig');
-const {HTTP_OK_NO_CONTENT, HTTP_OK_WITH_CONTENT, UNPROCESSABLE_ENTITY, INTERNAL_ERROR, RESOURCE_DOES_NOT_FIND} = require('../utils/constants');
-const {response, validateInput, emptyFieldsError} = require('../utils/genericService');
-const {createDBObjectToPut, createDBObjectToGet, createDBObjectToDelete, createDBObjectToScan} = require('../utils/dbService');
+const {dbClient} = require('../../config/dbConfig');
+const {HTTP_OK_NO_CONTENT, HTTP_OK_WITH_CONTENT, UNPROCESSABLE_ENTITY, INTERNAL_ERROR, RESOURCE_DOES_NOT_FIND} = require('../../utils/constants');
+const {response, validateInput, emptyFieldsError} = require('../../utils/genericService');
+const {createDBObjectToPut, createDBObjectToGet, createDBObjectToDelete, createDBObjectToScan} = require('../../utils/dbService');
 const {createTodoJSON, createDBObjectToUpdateAuthor} = require('./todoService');
 
 const getSingleTodo = async (event) => {
@@ -24,7 +24,7 @@ const getAllTodo = async () => {
     const param = createDBObjectToScan(process.env.TODO_TABLE);
     return await dbClient.scan(param).promise()
         .then(o1 => response(HTTP_OK_WITH_CONTENT, o1))
-        .catch((o1) => response(INTERNAL_ERROR, {"message": "Could not get todo's records", "error": o1}))
+        .catch((o1) => response(INTERNAL_ERROR, {"message": "Could not get todos's records", "error": o1}))
 };
 
 const createTodo = async (event) => {

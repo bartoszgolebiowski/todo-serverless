@@ -1,6 +1,6 @@
 const {expect} = require('chai');
 const {describe} = require("mocha");
-const {createTodoJSON, createDBObjectToUpdateAuthor} = require('../../src/todo/todoService');
+const {createTodoJSON, createDBObjectToUpdateAuthor} = require('../../src/controller/todo/todoService');
 
 describe('todoService tests', () => {
     context('creteTodoJSON tests', () => {
