@@ -1,9 +1,8 @@
 # package directories
 node_modules
 jspm_packages
-
+secrets.js
 # Serverless directories
 .serverless
 .dynamodb
 .idea/
-secrets.js
