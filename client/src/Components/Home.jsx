@@ -15,11 +15,9 @@ const Home = () => {
     const [todos, setTodos] = useState([]);
 
     useEffect(() => {
-        (async () => {
-            await fetch(`${url}${getAll}`)
-                .then(res => res.json())
-                .then(res => setTodos(res.Items))
-        })()
+        fetch(`${url}${getAll}`)
+            .then(res => res.json())
+            .then(res => setTodos(res.Items))
     }, []);
 
 
@@ -28,13 +26,11 @@ const Home = () => {
     };
 
     const handleOk = () => {
-        (async () => {
-            await fetch(`${url}${create}`, {method: 'POST', body: JSON.stringify(singleTodo)})
-                .then(res => res.json())
-                .then(todo => setTodos([...todos, todo]))
-                .then(() => setSingleTodo({name: '', author: ''}))
-                .then(() => setVisible(false));
-        })();
+        fetch(`${url}${create}`, {method: 'POST', body: JSON.stringify(singleTodo)})
+            .then(res => res.json())
+            .then(o1 => setTodos([...todos, o1.todo]))
+            .then(() => setSingleTodo({name: '', author: ''}))
+            .then(() => setVisible(false));
     };
 
     const handleCancel = () => {
