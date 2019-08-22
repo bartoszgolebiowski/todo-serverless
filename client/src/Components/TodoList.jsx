@@ -1,9 +1,13 @@
-import React from 'react'
-import { List } from 'antd';
+import React, {useEffect} from 'react'
+import {List} from 'antd';
 
-export default function TodoList(props) {
+const TodoList = (props) => {
 
-    const { todos } = props;
+    useEffect(() => {
+        console.log(props.todos)
+    }, []);
+
+    const {todos} = props;
 
     return (
         <List
@@ -17,4 +21,6 @@ export default function TodoList(props) {
             )}
         />
     )
-}
+};
+
+export default TodoList

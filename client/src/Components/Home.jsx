@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import { Modal, Button } from 'antd';
+import React, {useState, useEffect} from 'react'
+import {Modal, Button} from 'antd';
 
 import CreateTodo from './CreateTodo.jsx'
 import TodoList from './TodoList.jsx'
 
-export default function Home() {
+const Home = () => {
 
     const url = 'http://localhost:3000';
     const getAll = '/todo';
     const create = '/todo/create';
 
     const [visible, setVisible] = useState(false);
-    const [singleTodo, setSingleTodo] = useState({ name: '', author: '' });
+    const [singleTodo, setSingleTodo] = useState({name: '', author: ''});
     const [todos, setTodos] = useState([]);
 
     useEffect(() => {
-        (async function fetchData() {
-            const result = await fetch(`${url}${getAll}`)
-                .then(res => res.json());
-            setTodos(result.Items)
+        (async () => {
+            await fetch(`${url}${getAll}`)
+                .then(res => res.json())
+                .then(res => setTodos(res.Items))
         })()
     }, []);
 
@@ -28,14 +28,13 @@ export default function Home() {
     };
 
     const handleOk = () => {
-        setVisible(false);
-        async function postData() {
-            const { todo } = await fetch(`${url}${create}`, { method: 'POST', body: JSON.stringify(singleTodo) })
+        (async () => {
+            await fetch(`${url}${create}`, {method: 'POST', body: JSON.stringify(singleTodo)})
                 .then(res => res.json())
-            setTodos([...todos, todo]);
-        }
-        postData();
-        setSingleTodo({ name: '', author: '' });
+                .then(todo => setTodos([...todos, todo]))
+                .then(() => setSingleTodo({name: '', author: ''}))
+                .then(() => setVisible(false));
+        })();
     };
 
     const handleCancel = () => {
@@ -58,7 +57,8 @@ export default function Home() {
                     setTodo={setSingleTodo}
                 />
             </Modal>
-            <TodoList todos={todos} />
+            <TodoList todos={todos}/>
         </div>
     )
-}
+};
+export default Home

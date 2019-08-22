@@ -1,9 +1,9 @@
-import React from "react";
-import { Form, Input } from 'antd';
+import React, {useEffect} from "react";
+import {Form, Input} from 'antd';
 
-export default function CreateTodo(props) {
+const CreateTodo = (props) => {
 
-    const { todo, setTodo } = props;
+    const {todo, setTodo} = props;
 
     const updateField = e => {
         setTodo({
@@ -16,7 +16,7 @@ export default function CreateTodo(props) {
         <Form>
             <Form.Item>
                 Name:
-            <Input
+                <Input
                     name="name"
                     type="text"
                     value={todo.name}
@@ -25,7 +25,7 @@ export default function CreateTodo(props) {
             </Form.Item>
             <Form.Item>
                 Author:
-            <Input
+                <Input
                     name="author"
                     type="text"
                     value={todo.author}
@@ -34,5 +34,6 @@ export default function CreateTodo(props) {
             </Form.Item>
         </Form>
     );
+};
 
-}
+export default CreateTodo
