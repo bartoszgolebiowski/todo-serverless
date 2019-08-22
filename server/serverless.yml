@@ -77,7 +77,7 @@ custom:
               type: string
           required:
             - todo_id
-      - name: createUser
+      - name: user
         contentType: "application/json"
         schema:
             type: object
@@ -162,11 +162,24 @@ functions:
             summary: "Creates user"
             description: "Creates user"
             requestModels:
-              "application/json": createUser
+              "application/json": user
           path: user/create
           method: post
           reqValidatorName: onlyBody
 
+  login:
+    handler: src/controller/user/userController.login
+    name: login
+    events:
+      - http:
+          documentation:
+            summary: "Login users"
+            description: "Login users"
+            requestModels:
+              "application/json": user
+          path: login
+          method: post
+          reqValidatorName: onlyBody
 resources:
   Resources:
     userTable:

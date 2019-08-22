@@ -23,4 +23,17 @@ describe('userController integration tests', () => {
             console.log(result);
         });
     });
+
+    context('log in correct input', () => {
+        it('correct input', async () => {
+            const input = {
+                "username": "admin",
+                "password": "admin"
+            };
+            const result = await fetch(URL + '/login', {method: 'POST', body: JSON.stringify(input)})
+                .then(res => Promise.all([res.status, res.json()]))
+                .catch(res=> console.log(res));
+            console.log(result);
+        });
+    });
 });
