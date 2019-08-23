@@ -1,4 +1,4 @@
-service: aws-nodejs-todo
+service: aws-nodejs-Todo
 plugins:
   - serverless-reqvalidator-plugin
   - serverless-aws-documentation
@@ -12,10 +12,10 @@ provider:
   runtime: nodejs10.x
   stage: test
   region: eu-central-1
-  stackName: todo-bartosz-golebiowski-stack
-  apiName: todo-bartosz-golebiowski-api
+  stackName: Todo-bartosz-golebiowski-stack
+  apiName: Todo-bartosz-golebiowski-api
   deploymentBucket:
-    name: todo-bartosz-golebiowski-bucket
+    name: Todo-bartosz-golebiowski-bucket
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -45,7 +45,7 @@ custom:
       info:
         version: v1.0.0
         title: Todo API
-        description: Serverless, nodejs todo app
+        description: Serverless, nodejs Todo app
     models:
       - name: createTodo
         contentType: "application/json"
@@ -92,65 +92,66 @@ custom:
 
 functions:
   getAllTodo:
-    handler: src/controller/todo/todoController.getAllTodo
+    handler: src/controller/Todo/todoController.getAllTodo
     name: getAllTodo
     events:
     - http:
         documentation:
-          summary: "Gets all todo"
-          description: "Gets all todo"
-        path: todo
+          summary: "Gets all Todo"
+          description: "Gets all Todo"
+        path: Todo
         method: get
+        authorizer: auth
   createTodo:
-    handler: src/controller/todo/todoController.createTodo
+    handler: src/controller/Todo/todoController.createTodo
     name: createTodo
     events:
       - http:
           documentation:
-            summary: "Create new todo"
-            description: "Creates new todo"
+            summary: "Create new Todo"
+            description: "Creates new Todo"
             requestModels:
               "application/json": createTodo
-          path: todo/create
+          path: Todo/create
           method: post
           reqValidatorName: onlyBody
   updateTodo:
-    handler: src/controller/todo/todoController.updateTodo
+    handler: src/controller/Todo/todoController.updateTodo
     name: updateTodo
     events:
       - http:
           documentation:
-            summary: "Updates existing todo"
-            description: "Updates existing todo"
+            summary: "Updates existing Todo"
+            description: "Updates existing Todo"
             requestModels:
               "application/json": updateAndDeleteTodo
-          path: todo/update
+          path: Todo/update
           method: patch
           reqValidatorName: onlyBody
   deleteTodo:
-    handler: src/controller/todo/todoController.deleteTodo
+    handler: src/controller/Todo/todoController.deleteTodo
     name: deleteTodo
     events:
       - http:
           documentation:
-            summary: "Deletes todo"
-            description: "Deletes todo"
+            summary: "Deletes Todo"
+            description: "Deletes Todo"
             requestModels:
               "application/json": updateAndDeleteTodo
-          path: todo/delete
+          path: Todo/delete
           method: delete
           reqValidatorName: onlyBody
   getSingleTodo:
-    handler: src/controller/todo/todoController.getSingleTodo
+    handler: src/controller/Todo/todoController.getSingleTodo
     name: getSingleTodo
     events:
       - http:
           documentation:
-            summary: "Gets single todo"
-            description: "Gets single todo"
+            summary: "Gets single Todo"
+            description: "Gets single Todo"
             requestModels:
               "application/json": getSingleTodo
-          path: todo/{todo_id}
+          path: Todo/{todo_id}
           method: get
           reqValidatorName: onlyBody
   createUser:
@@ -168,8 +169,8 @@ functions:
           reqValidatorName: onlyBody
 
   login:
-    handler: src/controller/user/userController.login
-    name: login
+    handler: src/controller/user/userController.index
+    name: Login
     events:
       - http:
           documentation:
@@ -177,9 +178,13 @@ functions:
             description: "Login users"
             requestModels:
               "application/json": user
-          path: login
+          path: index
           method: post
           reqValidatorName: onlyBody
+  auth:
+    handler: src/controller/user/userController.auth
+    name: auth
+
 resources:
   Resources:
     userTable:

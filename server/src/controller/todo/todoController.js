@@ -17,7 +17,7 @@ const getSingleTodo = async (event) => {
         .then(o1 => Object.keys(o1).length !== 0 && o1.constructor === Object ?
             response(HTTP_OK_WITH_CONTENT, o1) :
             response(UNPROCESSABLE_ENTITY, {"message": "Todo does not exist", "todo_id": todo_id}))
-        .catch((o1) => response(RESOURCE_DOES_NOT_FIND, {"message": "Could not get single todo record", "error": o1}))
+        .catch((o1) => response(RESOURCE_DOES_NOT_FIND, {"message": "Could not get single Todo record", "error": o1}))
 };
 
 const getAllTodo = async () => {

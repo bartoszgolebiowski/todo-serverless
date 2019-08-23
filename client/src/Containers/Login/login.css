@@ -1,0 +1,21 @@
+.login-container {
+    border-style: solid;
+    border-width: 1px;
+    width: 20%;
+    margin: 0 auto;
+    align-items: center;
+    justify-content: center;
+}
+.login-header{
+    background-color: white;
+    border-bottom: 1px solid black;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.login-form {
+    margin: 10%;
+}
+.login-form-button {
+    width: 100%;
+}

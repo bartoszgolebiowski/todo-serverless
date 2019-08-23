@@ -48,7 +48,7 @@ const login = async (event) => {
             response(UNAUTHORIZED, {"message": "Password does not match!"}))
         .catch((o3) => o3 === 'User does not exists' ?
             response(CONFLICT, {"message": "User does not exists!", "error": o3}) :
-            response(INTERNAL_ERROR, {"message": "Can not login!", "error": o3}));
+            response(INTERNAL_ERROR, {"message": "Can not Login!", "error": o3}));
 };
 
 const auth = async (event) => {
@@ -57,9 +57,12 @@ const auth = async (event) => {
     if (!token)
         return response(FORBIDDEN,'Missing authorization Token');
 
-    return await verifyToken(token, TOKEN_SECRET)
-        .then(o1 => generatePolicy(o1.username, 'Allow', event.methodArn))
+
+    const result =  await verifyToken(token, TOKEN_SECRET)
+        .then(o1 =>generatePolicy(o1.username, 'Allow', event.methodArn))
         .catch(()=> response(UNAUTHORIZED,'Token is not valid'));
+    console.log(result)
+    return result
 };
 
 module.exports = {
