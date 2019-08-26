@@ -32,7 +32,7 @@
     "serverless-aws-alias": "^1.7.2",
     "serverless-aws-documentation": "^1.1.0",
     "serverless-deployment-bucket": "^1.1.0",
-    "serverless-dynamodb-local": "^0.2.35",
+    "serverless-dynamodb-local": "^0.2.30",
     "serverless-iam-roles-per-function": "^2.0.1",
     "serverless-offline": "^5.10.1",
     "serverless-reqvalidator-plugin": "^1.0.3",

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Icon, Button, Input, Form, Layout} from 'antd';
+import {Icon, Button, Input, Form, Layout, notification} from 'antd';
 import './login.css'
 
 import Axios from '../../globalAxios'
@@ -8,17 +8,33 @@ import {login} from '../../Utils/Login/index'
 
 const Login = (props) => {
 
+    const [submitStatus, setSubmitStatus] = useState(false);
+
     const onSubmit = e => {
         e.preventDefault();
         props.form.validateFields((err, values) => {
             if (!err) {
-                const {username, password} = values;
-                Axios.post(LOGIN, {username, password})
-                    .then(o1 => login(o1.token))
+                setSubmitStatus(true);
+                Axios.post(LOGIN, {...values})
+                    .then(res => {
+                        login(res.data.token);
+                        setSubmitStatus(false);
+                        props.history.push('/home');
+                        notification.open({message: res.data.message});
+                    })
+                    .catch(err => {
+                        notification.open({
+                            message: err.response.data.message,
+                            description: err.response.data.error
+                        });
+                        setSubmitStatus(false)
+                    })
             }
         });
     };
+
     const {getFieldDecorator} = props.form;
+
     return (
         <div className="login-container">
             <Layout.Header className="login-header">Login</Layout.Header>
@@ -47,7 +63,7 @@ const Login = (props) => {
                     )}
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-form-button">
+                    <Button type="primary" htmlType="submit" className="login-form-button" disabled={submitStatus}>
                         Log in
                     </Button>
                     <a>Register</a>
@@ -56,6 +72,6 @@ const Login = (props) => {
         </div>
     )
 };
-const LoginForm = Form.create({name: 'normal_login'})(Login);
+const LoginForm = Form.create({name: 'login_form'})(Login);
 
 export default LoginForm;

@@ -1,6 +1,6 @@
 const {expect} = require('chai');
 const {describe} = require("mocha");
-const {createTodoJSON, createDBObjectToUpdateAuthor} = require('../../src/controller/todo/todoService');
+const {createTodoJSON, createDBObjectToUpdate} = require('../../src/controller/todo/todoService');
 
 describe('todoService tests', () => {
     context('creteTodoJSON tests', () => {
@@ -36,15 +36,19 @@ describe('todoService tests', () => {
                 "author": "Jakub"
             };
 
-            const result = createDBObjectToUpdateAuthor(tableName, input);
-            const {TableName, Key, ExpressionAttributeValues} = result;
-
+            const result = createDBObjectToUpdate(tableName, input);
+            const {TableName, Key, UpdateExpression, ExpressionAttributeValues} = result;
 
             expect(result).to.be.an('object');
             expect(result).to.have.all.keys('TableName', 'Key', 'UpdateExpression', 'ExpressionAttributeValues', 'ReturnValues');
             expect(TableName).to.be.deep.equal(tableName);
             expect(Key).to.be.deep.equal({todo_id: input.todo_id});
-            expect(ExpressionAttributeValues).to.be.deep.equal({":author": input.author});
+            expect(UpdateExpression).to.be.deep.equal("set todo_id = :todo_id, name = :name, author = :author");
+            expect(ExpressionAttributeValues).to.be.deep.equal({
+                ":todo_id": input.todo_id,
+                ":name": input.name,
+                ":author": input.author,
+            });
         })
     })
 });

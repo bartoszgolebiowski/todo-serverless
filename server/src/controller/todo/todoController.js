@@ -1,15 +1,15 @@
 'use strict';
 const {dbClient} = require('../../config/dbConfig');
 const {HTTP_OK_NO_CONTENT, HTTP_OK_WITH_CONTENT, UNPROCESSABLE_ENTITY, INTERNAL_ERROR, RESOURCE_DOES_NOT_FIND} = require('../../utils/constants');
-const {response, validateInput, emptyFieldsError} = require('../../utils/genericService');
+const {response, validateInput, emptyFieldsError, createDBObjectToUpdate} = require('../../utils/genericService');
 const {createDBObjectToPut, createDBObjectToGet, createDBObjectToDelete, createDBObjectToScan} = require('../../utils/dbService');
-const {createTodoJSON, createDBObjectToUpdateAuthor} = require('./todoService');
+const {createTodoJSON} = require('./todoService');
 
 const getSingleTodo = async (event) => {
     const {todo_id} = event.pathParameters;
 
     if (todo_id === undefined) {
-        return response(UNPROCESSABLE_ENTITY, {"message": "Missing pathParameter: \"todo_id\""});
+        return response(UNPROCESSABLE_ENTITY, {"message": "Incorrect input", "error": "Missing path parameter"});
     }
 
     const paramGetSingle = createDBObjectToGet(process.env.TODO_TABLE, {todo_id});
@@ -17,14 +17,14 @@ const getSingleTodo = async (event) => {
         .then(o1 => Object.keys(o1).length !== 0 && o1.constructor === Object ?
             response(HTTP_OK_WITH_CONTENT, o1) :
             response(UNPROCESSABLE_ENTITY, {"message": "Todo does not exist", "todo_id": todo_id}))
-        .catch((o1) => response(RESOURCE_DOES_NOT_FIND, {"message": "Could not get single Todo record", "error": o1}))
+        .catch((o1) => response(RESOURCE_DOES_NOT_FIND, {"message": "Could not get single todo record", "error": o1}))
 };
 
 const getAllTodo = async () => {
     const param = createDBObjectToScan(process.env.TODO_TABLE);
     return await dbClient.scan(param).promise()
         .then(o1 => response(HTTP_OK_WITH_CONTENT, o1))
-        .catch((o1) => response(INTERNAL_ERROR, {"message": "Could not get todos's records", "error": o1}))
+        .catch((o1) => response(INTERNAL_ERROR, {"message": "Could not get all todos", "error": o1}))
 };
 
 const createTodo = async (event) => {
@@ -37,7 +37,7 @@ const createTodo = async (event) => {
     const entity = createTodoJSON(input);
     const todoDBObject = createDBObjectToPut(process.env.TODO_TABLE, entity);
     return await dbClient.put(todoDBObject).promise()
-        .then(() => response(HTTP_OK_WITH_CONTENT, {"message": "Todo saved!", "todo": entity}))
+        .then(() => response(HTTP_OK_WITH_CONTENT, {"message": "Todo saved!", entity}))
         .catch((o1) => response(INTERNAL_ERROR, {"message": "Todo could not be saved!", "error": o1}))
 };
 
@@ -57,7 +57,8 @@ const deleteTodo = async (event) => {
                 "message": "Todo could not be deleted!",
                 "error": "Can not deleted non existing item"
             }) :
-            response(HTTP_OK_NO_CONTENT, {"message": "Todo deleted!"}));
+            response(HTTP_OK_NO_CONTENT, {"message": "Todo deleted!"}))
+        .catch((o1) => response(INTERNAL_ERROR, {"message": "Todo could not be deleted!", "error": o1}))
 };
 
 const updateTodo = async (event) => {
@@ -67,7 +68,7 @@ const updateTodo = async (event) => {
     if (Array.isArray(inputErrors) && inputErrors.length) {
         return response(UNPROCESSABLE_ENTITY, emptyFieldsError(inputErrors));
     }
-    const todoDBObject = createDBObjectToUpdateAuthor(process.env.TODO_TABLE, input);
+    const todoDBObject = createDBObjectToUpdate(process.env.TODO_TABLE, input);
     const paramGetSingle = createDBObjectToGet(process.env.TODO_TABLE, {"todo_id": input.todo_id});
 
     return await Promise.all([dbClient.get(paramGetSingle).promise(), dbClient.update(todoDBObject).promise()])
@@ -76,7 +77,8 @@ const updateTodo = async (event) => {
                 "message": "Todo could not be updated!",
                 "error": "Can not update non existing item"
             }) :
-            response(HTTP_OK_WITH_CONTENT, {"message": "Todo updated!", "item": o1[1]}));
+            response(HTTP_OK_WITH_CONTENT, {"message": "Todo updated!", "item": o1[1]}))
+        .catch((o1) => response(INTERNAL_ERROR, {"message": "Todo could not be updated!", "error": o1}))
 };
 
 module.exports = {

@@ -13,7 +13,13 @@ export const logout = () => {
 };
 
 export const isLogin = () => {
-    return !!localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(TOKEN_KEY);
+
+    if(!!token){
+        globalAxios.defaults.headers.common['Authorization'] = token;
+        return true;
+    }
+    return false;
 };
 
 

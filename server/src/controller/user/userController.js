@@ -26,7 +26,7 @@ const createUser = async (event) => {
         })
         .then(() => response(HTTP_OK_NO_CONTENT, {"message": "User created!"}))
         .catch((o2) => o2 === 'User already exists' ?
-            response(CONFLICT, {"message": "User could not be created!", "error": o2}) :
+            response(CONFLICT, {"message": "User could not be created!", "error": "User already exists"}) :
             response(INTERNAL_ERROR, {"message": "User could not be created!", "error": o2}))
 };
 
@@ -45,9 +45,9 @@ const login = async (event) => {
             Promise.all([comparePasswords(input.password, o1.Item.password), generateToken(input.username, TOKEN_SECRET)]))
         .then((o2) => o2[0] ?
             response(HTTP_OK_NO_CONTENT, {"message": "User Logged!", "token_type": TOKEN_TYPE, "token": o2[1]}) :
-            response(UNAUTHORIZED, {"message": "Password does not match!"}))
+            response(UNAUTHORIZED, {"message": "Can not Login!", "error": "Password does not match!"}))
         .catch((o3) => o3 === 'User does not exists' ?
-            response(CONFLICT, {"message": "User does not exists!", "error": o3}) :
+            response(CONFLICT, {"message": "Can not Login!", "error": "User does not exists!"}) :
             response(INTERNAL_ERROR, {"message": "Can not Login!", "error": o3}));
 };
 
@@ -55,14 +55,11 @@ const auth = async (event) => {
     const token = event.authorizationToken;
 
     if (!token)
-        return response(FORBIDDEN,'Missing authorization Token');
+        return response(FORBIDDEN, 'Missing authorization Token');
 
-
-    const result =  await verifyToken(token, TOKEN_SECRET)
-        .then(o1 =>generatePolicy(o1.username, 'Allow', event.methodArn))
-        .catch(()=> response(UNAUTHORIZED,'Token is not valid'));
-    console.log(result)
-    return result
+    return await verifyToken(token, TOKEN_SECRET)
+        .then(o1 => generatePolicy(o1.username, 'Allow', event.methodArn))
+        .catch((o2) => response(UNAUTHORIZED, {"message" : 'Authentication error', "error": o2}));
 };
 
 module.exports = {

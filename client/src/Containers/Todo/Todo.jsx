@@ -1,37 +1,55 @@
 import React, {useState, useEffect} from 'react'
-import {Layout, Modal, Button, List} from 'antd';
+import {Layout, Button, List, notification, Icon} from 'antd';
+import './todo.css'
 
 import globalAxios from "../../globalAxios";
-import {GET_ALL_TODOS, CREATE_TODO} from "../../endpoints";
+import {GET_ALL_TODOS, DELETE_TODO} from "../../endpoints";
 
 import CreateTodo from './CreateTodo.jsx'
-const { Header, Content, Footer } = Layout;
+import EditTodo from './EditTodo.jsx'
+
+const {Header, Content, Footer} = Layout;
 
 const Todo = () => {
-    const [visible, setVisible] = useState(false);
-    const [singleTodo, setSingleTodo] = useState({name: '', author: ''});
+    const [visibleCreate, setVisibleCreate] = useState(false);
+    const [visibleEdit, setVisibleEdit] = useState(false);
     const [todos, setTodos] = useState([]);
-
-    useEffect(() => {
-        globalAxios.get(GET_ALL_TODOS)
-            .then(res => setTodos(res.Items))
-    }, []);
-
+    const [selectedTodo, setSelectedTodo] = useState({"todo_id": "", "name": "", "author": ""});
 
     const showModal = () => {
-        setVisible(true);
+        setVisibleCreate(true);
     };
 
-    const handleCancel = () => {
-        setVisible(false);
+    const edit = (item) => {
+        setSelectedTodo(item);
+        setVisibleEdit(true);
     };
 
-    const handleOk = () => {
-        globalAxios.post(CREATE_TODO, {singleTodo})
-            .then(o1 => setTodos([...todos, o1.todo]))
-            .then(() => setVisible(false))
-            .then(() => setSingleTodo({name: '', author: ''}))
+    const remove = (todo_id) => {
+        globalAxios.delete(DELETE_TODO, {data: {todo_id}})
+            .then(res => {
+                const index = todos.findIndex(o1 => o1.todo_id === todo_id);
+                setTodos([...todos.slice(0, index), ...todos.slice(index + 1)]);
+                notification.open({message: res.data.message});
+            })
+            .catch(err => notification.open({
+                message: err.response.data.message,
+                description: err.response.data.error
+            }))
     };
+
+    const getAllTodos = () => {
+        globalAxios.get(GET_ALL_TODOS)
+            .then(res => setTodos(res.data.Items))
+            .catch(err => notification.open({
+                message: err.response.data.message,
+                description: err.response.data.error
+            }));
+    };
+
+    useEffect(() => {
+        getAllTodos();
+    }, []);
 
     const showTodos = (todos) => {
         return (
@@ -41,7 +59,16 @@ const Todo = () => {
                 dataSource={todos}
                 renderItem={item => (
                     <List.Item>
-                        {item.name}
+                        <div>
+                            <List.Item.Meta
+                                title={item.name}
+                                description={item.author}
+                            />
+                        </div>
+                        <div className="todo-modification">
+                            <Icon className="todo-icon" type="edit" onClick={() => edit(item)}/>
+                            <Icon className="todo-icon" type="delete" onClick={() => remove(item.todo_id)}/>
+                        </div>
                     </List.Item>
                 )}
             />
@@ -50,25 +77,30 @@ const Todo = () => {
 
     return (
         <Layout className="layout">
-            <Header>Header</Header>
+            <Header className="header">Todo list</Header>
             <Content>
                 <Button type="primary" onClick={showModal}>
                     Create todo
                 </Button>
-                <Modal
-                    title="Create todo"
-                    visible={visible}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                >
-                    <CreateTodo
-                        todo={singleTodo}
-                        setTodo={setSingleTodo}
-                    />
-                </Modal>
+                <Button type="secondary" onClick={getAllTodos}>
+                    Refresh
+                </Button>
+                <CreateTodo
+                    visible={visibleCreate}
+                    setVisible={setVisibleCreate}
+                    todos={todos}
+                    setTodos={setTodos}
+                />
+                <EditTodo
+                    visible={visibleEdit}
+                    setVisible={setVisibleEdit}
+                    todos={todos}
+                    setTodos={setTodos}
+                    selectedTodo={selectedTodo}
+                />
                 {showTodos(todos)}
             </Content>
-            <Footer>Footer</Footer>
+            <Footer className="footer">Serverless & react app</Footer>
         </Layout>
     )
 };

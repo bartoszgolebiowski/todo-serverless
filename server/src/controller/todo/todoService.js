@@ -6,24 +6,8 @@ const creteTodoJSON = (input) => {
     return Object.assign({}, input, idJSON);
 };
 
-const createDBObjectToUpdateAuthor = (tableName, input) => {
-    const {todo_id, author} = input;
-    return {
-        TableName: tableName,
-        Key: {
-            todo_id,
-        },
-        UpdateExpression: "set author = :author",
-        ExpressionAttributeValues: {
-            ":author": author
-        },
-        ReturnValues: "UPDATED_NEW"
-    };
-};
-
 module.exports = {
-    createTodoJSON: creteTodoJSON,
-    createDBObjectToUpdateAuthor: createDBObjectToUpdateAuthor,
+    createTodoJSON: creteTodoJSON
 };
 
 

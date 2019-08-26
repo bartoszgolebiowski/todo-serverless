@@ -99,7 +99,7 @@ functions:
         documentation:
           summary: "Gets all Todo"
           description: "Gets all Todo"
-        path: Todo
+        path: todo
         method: get
         authorizer: auth
   createTodo:
@@ -112,7 +112,7 @@ functions:
             description: "Creates new Todo"
             requestModels:
               "application/json": createTodo
-          path: Todo/create
+          path: todo/create
           method: post
           reqValidatorName: onlyBody
   updateTodo:
@@ -125,7 +125,7 @@ functions:
             description: "Updates existing Todo"
             requestModels:
               "application/json": updateAndDeleteTodo
-          path: Todo/update
+          path: todo/update
           method: patch
           reqValidatorName: onlyBody
   deleteTodo:
@@ -138,7 +138,7 @@ functions:
             description: "Deletes Todo"
             requestModels:
               "application/json": updateAndDeleteTodo
-          path: Todo/delete
+          path: todo/delete
           method: delete
           reqValidatorName: onlyBody
   getSingleTodo:
@@ -151,7 +151,7 @@ functions:
             description: "Gets single Todo"
             requestModels:
               "application/json": getSingleTodo
-          path: Todo/{todo_id}
+          path: todo/{todo_id}
           method: get
           reqValidatorName: onlyBody
   createUser:
@@ -169,7 +169,7 @@ functions:
           reqValidatorName: onlyBody
 
   login:
-    handler: src/controller/user/userController.index
+    handler: src/controller/user/userController.login
     name: Login
     events:
       - http:
@@ -178,7 +178,7 @@ functions:
             description: "Login users"
             requestModels:
               "application/json": user
-          path: index
+          path: login
           method: post
           reqValidatorName: onlyBody
   auth:
