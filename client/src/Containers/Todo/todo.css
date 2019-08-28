@@ -1,18 +1,26 @@
-
+.todo-icon {
+    padding: 10px 10px 10px 10px;
+}
 .todo-modification {
     flex: 1;
     text-align: right;
 }
-
-.todo-icon {
-    padding: 10px 10px 10px 10px;
+.todo-list{
+    margin: 20px;
 }
-.header {
-    background-color: white;
+.todo-buttons-container {
+    margin: 15px;
+    display: flex;
+    justify-content: flex-end
+}
+.todo-button {
+    margin-right: 20px;
+}
+.text-center {
     align-content: center;
     text-align: center;
 }
-.footer {
-    align-content: center;
-    text-align: center;
+.todo-content {
+    margin: 40px 300px;
+    border: 1px solid;
 }

@@ -46,6 +46,7 @@ const EditTodo = (props) => {
                         rules: [{required: true, message: 'Please input name!'}],
                     })(
                         <Input
+                            disabled
                             name='name'
                             type="text"
                             placeholder="name"

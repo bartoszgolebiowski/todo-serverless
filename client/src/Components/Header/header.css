@@ -1,0 +1,8 @@
+.header {
+    background-color: white;
+    min-height: 64px;
+}
+.logout {
+    display: flex;
+    justify-content: flex-end
+}

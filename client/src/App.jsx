@@ -1,26 +1,27 @@
 import React from "react";
-import {BrowserRouter, Switch} from 'react-router-dom';
+import {BrowserRouter, Router, Route} from 'react-router-dom';
 
-import PrivateRoute from './Components/Route/PrivateRoute';
-import PublicRoute from './Components/Route/PublicRoute'
+import PrivateRoute from './Components/Route/PrivateRoute.jsx';
+import PublicRoute from './Components/Route/PublicRoute.jsx'
 import Home from './Containers/Home/Home.jsx'
 import Todo from './Containers/Todo/Todo.jsx'
 import Login from './Containers/Login/Login.jsx'
 import Registration from './Containers/Login/Registration.jsx'
+import Header from "./Components/Header/Header.jsx";
+import {isLogin} from "./Utils/Login";
 
 const App = () => {
+    const isLoggedIn = isLogin();
     return (
-        <div>
-            <BrowserRouter>
-                <Switch>
-                    <PublicRoute restricted={false} component={Home} path="/" exact/>
-                    <PublicRoute restricted={true} component={Login} path="/login" exact/>
-                    <PublicRoute restricted={true} component={Registration} path="/registration" exact/>
-                    <PrivateRoute component={Todo} path="/todos" exact/>
-                </Switch>
-            </BrowserRouter>
-        </div>
+        <BrowserRouter>
+            <Header isLoggedIn={isLoggedIn}/>
+            <PrivateRoute component={Home} path="/home"/>
+            <PublicRoute restricted={true} component={Login} path="/login"/>
+            <PublicRoute restricted={true} component={Registration} path="/registration"/>
+            <PrivateRoute component={Todo} path="/todo"/>
+        </BrowserRouter>
     )
 };
+
 
 export default App;

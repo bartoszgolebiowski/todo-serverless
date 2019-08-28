@@ -23,6 +23,7 @@ const Login = (props) => {
                         notification.open({message: res.data.message});
                     })
                     .catch(err => {
+                        console.log(err.response);
                         notification.open({
                             message: err.response.data.message,
                             description: err.response.data.error
@@ -66,7 +67,9 @@ const Login = (props) => {
                     <Button type="primary" htmlType="submit" className="login-form-button" disabled={submitStatus}>
                         Log in
                     </Button>
-                    <a>Register</a>
+                    <div className="registration-container">
+                        Not registered? <a>Create an account</a>
+                    </div>
                 </Form.Item>
             </Form>
         </div>

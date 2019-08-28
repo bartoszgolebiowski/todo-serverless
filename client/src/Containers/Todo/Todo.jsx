@@ -8,7 +8,7 @@ import {GET_ALL_TODOS, DELETE_TODO} from "../../endpoints";
 import CreateTodo from './CreateTodo.jsx'
 import EditTodo from './EditTodo.jsx'
 
-const {Header, Content, Footer} = Layout;
+const {Content, Footer} = Layout;
 
 const Todo = () => {
     const [visibleCreate, setVisibleCreate] = useState(false);
@@ -53,38 +53,41 @@ const Todo = () => {
 
     const showTodos = (todos) => {
         return (
-            <List
-                header={<div>Todo list</div>}
-                bordered
-                dataSource={todos}
-                renderItem={item => (
-                    <List.Item>
-                        <div>
-                            <List.Item.Meta
-                                title={item.name}
-                                description={item.author}
-                            />
-                        </div>
-                        <div className="todo-modification">
-                            <Icon className="todo-icon" type="edit" onClick={() => edit(item)}/>
-                            <Icon className="todo-icon" type="delete" onClick={() => remove(item.todo_id)}/>
-                        </div>
-                    </List.Item>
-                )}
-            />
+            <div className="todo-list">
+                <List
+                    header={<div className="text-center">Todo list</div>}
+                    bordered
+                    dataSource={todos}
+                    renderItem={item => (
+                        <List.Item>
+                            <div>
+                                <List.Item.Meta
+                                    title={item.name}
+                                    description={item.author}
+                                />
+                            </div>
+                            <div className="todo-modification">
+                                <Icon className="todo-icon" type="edit" onClick={() => edit(item)}/>
+                                <Icon className="todo-icon" type="delete" onClick={() => remove(item.todo_id)}/>
+                            </div>
+                        </List.Item>
+                    )}
+                />
+            </div>
         )
     };
 
     return (
-        <Layout className="layout">
-            <Header className="header">Todo list</Header>
+        <Layout className="layout todo-content">
             <Content>
-                <Button type="primary" onClick={showModal}>
-                    Create todo
-                </Button>
-                <Button type="secondary" onClick={getAllTodos}>
-                    Refresh
-                </Button>
+                <div className="todo-buttons-container">
+                    <Button className="todo-button" type="primary" onClick={showModal}>
+                        Create todo
+                    </Button>
+                    <Button className="todo-button" type="secondary" onClick={getAllTodos}>
+                        Refresh
+                    </Button>
+                </div>
                 <CreateTodo
                     visible={visibleCreate}
                     setVisible={setVisibleCreate}
@@ -100,7 +103,7 @@ const Todo = () => {
                 />
                 {showTodos(todos)}
             </Content>
-            <Footer className="footer">Serverless & react app</Footer>
+            <Footer className="text-center">Serverless & React app</Footer>
         </Layout>
     )
 };
