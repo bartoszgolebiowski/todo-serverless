@@ -3,7 +3,7 @@ const {dbClient} = require('../../config/dbConfig');
 const {HTTP_OK_NO_CONTENT, HTTP_OK_WITH_CONTENT, UNPROCESSABLE_ENTITY, INTERNAL_ERROR, RESOURCE_DOES_NOT_FIND} = require('../../utils/constants');
 const {response, validateInput, emptyFieldsError, createDBObjectToUpdate} = require('../../utils/genericService');
 const {createDBObjectToPut, createDBObjectToGet, createDBObjectToDelete, createDBObjectToScan} = require('../../utils/dbService');
-const {createTodoJSON} = require('./todoService');
+const {createTodoJSON, addMessageToTodoJSON} = require('./todoService');
 
 const getSingleTodo = async (event) => {
     const {todo_id} = event.pathParameters;
@@ -41,6 +41,23 @@ const createTodo = async (event) => {
         .catch((o1) => response(INTERNAL_ERROR, {"message": "Todo could not be saved!", "error": o1}))
 };
 
+const addComment = async (event) => {
+    const input = JSON.parse(event.body);
+    const inputErrors = validateInput(input);
+
+    if (Array.isArray(inputErrors) && inputErrors.length) {
+        return response(UNPROCESSABLE_ENTITY, emptyFieldsError(inputErrors));
+    }
+    const {todo_id} = input;
+    const entity = addMessageToTodoJSON(process.env.TODO_TABLE, input);
+    const paramGetSingle = createDBObjectToGet(process.env.TODO_TABLE, {todo_id});
+    return await Promise.all([dbClient.get(paramGetSingle).promise(), dbClient.update(entity).promise()])
+        .then((o1) => Object.keys(o1[0]).length !== 0 && o1[0].constructor === Object ?
+            response(HTTP_OK_NO_CONTENT, {"message": "Comment saved!"}) :
+            response(UNPROCESSABLE_ENTITY, {"message": "Todo does not exist", "todo_id": todo_id}))
+        .catch((o1) => response(INTERNAL_ERROR, {"message": "Comment could not be saved!", "error": o1}))
+};
+
 const deleteTodo = async (event) => {
     const input = JSON.parse(event.body);
     const inputErrors = validateInput(input);
@@ -68,7 +85,7 @@ const updateTodo = async (event) => {
     if (Array.isArray(inputErrors) && inputErrors.length) {
         return response(UNPROCESSABLE_ENTITY, emptyFieldsError(inputErrors));
     }
-    const todoDBObject = createDBObjectToUpdate(process.env.TODO_TABLE, input);
+    const todoDBObject = createDBObjectToUpdate(process.env.TODO_TABLE, input, {"todo_id": input.todo_id});
     const paramGetSingle = createDBObjectToGet(process.env.TODO_TABLE, {"todo_id": input.todo_id});
 
     return await Promise.all([dbClient.get(paramGetSingle).promise(), dbClient.update(todoDBObject).promise()])
@@ -87,4 +104,5 @@ module.exports = {
     updateTodo: updateTodo,
     getAllTodo: getAllTodo,
     getSingleTodo: getSingleTodo,
+    addComment: addComment,
 };

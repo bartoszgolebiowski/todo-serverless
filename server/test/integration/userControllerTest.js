@@ -20,7 +20,7 @@ describe('userController integration tests', () => {
             const result = await fetch(URL + '/user/create', {method: 'POST', body: JSON.stringify(input)})
                 .then(res => Promise.all([res.status, res.json()]))
                 .catch(res=> console.log(res));
-            console.log(result);
+
         });
     });
 
@@ -33,7 +33,7 @@ describe('userController integration tests', () => {
             const result = await fetch(URL + '/login', {method: 'POST', body: JSON.stringify(input)})
                 .then(res => Promise.all([res.status, res.json()]))
                 .catch(res=> console.log(res));
-            console.log(result);
+
         });
     });
 });

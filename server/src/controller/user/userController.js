@@ -37,7 +37,6 @@ const login = async (event) => {
     if (Array.isArray(inputErrors) && inputErrors.length) {
         return response(UNPROCESSABLE_ENTITY, emptyFieldsError(inputErrors));
     }
-
     const getUserParam = createDBObjectToGet(process.env.USER_TABLE, {"username": input.username});
     return await dbClient.get(getUserParam).promise()
         .then(o1 => Object.keys(o1).length === 0 && o1.constructor === Object ?

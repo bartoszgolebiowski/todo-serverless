@@ -4,8 +4,6 @@ plugins:
   - serverless-aws-documentation
   - serverless-deployment-bucket
   - serverless-iam-roles-per-function
-  - serverless-aws-alias
-  - serverless-dynamodb-local
   - serverless-offline
 provider:
   name: aws
@@ -47,6 +45,19 @@ custom:
         title: Todo API
         description: Serverless, nodejs Todo app
     models:
+      - name: todoComment
+        contentType: "application/json"
+        schema:
+            type: object
+            properties:
+              todo_id:
+                type: string
+              comment:
+                type: string
+            required:
+              - todo_id
+              - comment
+
       - name: createTodo
         contentType: "application/json"
         schema:
@@ -54,21 +65,13 @@ custom:
           properties:
             name:
               type: string
-          required:
-            - name
-      - name: updateAndDeleteTodo
-        contentType: "application/json"
-        schema:
-          type: object
-          properties:
-            id:
-              type: string
-            name:
+            author:
               type: string
           required:
-            - todo_id
             - name
-      - name: getSingleTodo
+            - author
+
+      - name: todo
         contentType: "application/json"
         schema:
           type: object
@@ -77,6 +80,7 @@ custom:
               type: string
           required:
             - todo_id
+
       - name: user
         contentType: "application/json"
         schema:
@@ -102,6 +106,18 @@ functions:
         path: todo
         method: get
         authorizer: auth
+
+  getSingleTodo:
+    handler: src/controller/Todo/todoController.getSingleTodo
+    name: getSingleTodo
+    events:
+      - http:
+          documentation:
+            summary: "Gets single Todo"
+            description: "Gets single Todo"
+          path: todo/{todo_id}
+          method: get
+
   createTodo:
     handler: src/controller/Todo/todoController.createTodo
     name: createTodo
@@ -115,6 +131,7 @@ functions:
           path: todo/create
           method: post
           reqValidatorName: onlyBody
+
   updateTodo:
     handler: src/controller/Todo/todoController.updateTodo
     name: updateTodo
@@ -124,10 +141,11 @@ functions:
             summary: "Updates existing Todo"
             description: "Updates existing Todo"
             requestModels:
-              "application/json": updateAndDeleteTodo
+              "application/json": todo
           path: todo/update
           method: patch
           reqValidatorName: onlyBody
+
   deleteTodo:
     handler: src/controller/Todo/todoController.deleteTodo
     name: deleteTodo
@@ -137,23 +155,24 @@ functions:
             summary: "Deletes Todo"
             description: "Deletes Todo"
             requestModels:
-              "application/json": updateAndDeleteTodo
+              "application/json": todo
           path: todo/delete
           method: delete
           reqValidatorName: onlyBody
-  getSingleTodo:
-    handler: src/controller/Todo/todoController.getSingleTodo
-    name: getSingleTodo
+
+  addComment:
+    handler: src/controller/Todo/todoController.addComment
+    name: todoComment
     events:
-      - http:
-          documentation:
-            summary: "Gets single Todo"
-            description: "Gets single Todo"
-            requestModels:
-              "application/json": getSingleTodo
-          path: todo/{todo_id}
-          method: get
-          reqValidatorName: onlyBody
+        - http:
+            documentation:
+              summary: "Add comment to Todo"
+              description: "Add comment to Todo"
+              requestModels:
+                "application/json": todoComment
+            path: todo/message
+            method: PATCH
+            reqValidatorName: onlyBody
   createUser:
     handler: src/controller/user/userController.createUser
     name: createUser
@@ -181,6 +200,7 @@ functions:
           path: login
           method: post
           reqValidatorName: onlyBody
+
   auth:
     handler: src/controller/user/userController.auth
     name: auth

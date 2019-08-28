@@ -46,7 +46,7 @@ describe('Check table operations', () => {
                     {
                         "AttributeName": "username",
                         "KeyType": "HASH"
-                    }
+                    },
                 ],
                 "ProvisionedThroughput": {
                     "ReadCapacityUnits": 1,
