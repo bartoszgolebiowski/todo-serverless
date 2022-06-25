@@ -27,7 +27,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^6.2.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.7",
     "serverless": "^1.49.0",
     "serverless-aws-alias": "^1.7.2",
     "serverless-aws-documentation": "^1.1.0",
